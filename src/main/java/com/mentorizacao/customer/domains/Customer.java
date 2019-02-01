@@ -19,7 +19,15 @@ import java.util.Date;
  *
  * The <code>Movie</code> class is POJO (Plain Old Java Object) for a set/get of movie (table) from H2 database.
  *
+ * @author gaugusto@betait.com.br
+ * @version 1.0
+ * @since JDK1.8
  *
+ * @see AllArgsConstructor
+ * @see Builder
+ * @see Data
+ * @see Entity
+ * @see NoArgsConstructor
  */
 @AllArgsConstructor
 @Builder
