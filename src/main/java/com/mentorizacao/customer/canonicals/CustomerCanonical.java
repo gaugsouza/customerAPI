@@ -34,6 +34,9 @@ public class CustomerCanonical extends Canonical {
     @ApiModelProperty(notes = "The auto-generated version of the customer")
     private Integer version  = null;
 
+    @ApiModelProperty(notes = "The actual state of customer: 0 = Inactive; 1 = Active. (Logical deletion)")
+    private boolean active = false;
+
     @ApiModelProperty(notes = "The customer's first name")
     private String firstName = null;
 
