@@ -34,19 +34,17 @@ import java.util.Date;
 @Data
 @Entity
 @NoArgsConstructor
-public class Customer implements Serializable {
+public class Customer extends Object implements Serializable {
     private static final long serialVersionUID = -5446424219885333861L;
 
     /** The customer's user name and its primary key*/
     @Id
+    @GeneratedValue
     private String userName = null;
 
     /** The auto-generated version of the customer*/
     @Version
     private Integer version  = null;
-
-    /** The actual state of customer: true = Active; false = Inactive. (Logical deletion)*/
-    private boolean active = false;
 
     /** The customer's first name */
     private String firstName = null;
