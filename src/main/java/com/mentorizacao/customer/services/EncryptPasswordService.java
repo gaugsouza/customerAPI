@@ -42,7 +42,7 @@ public class EncryptPasswordService {
         return diff == 0;
     }
 
-    private byte[] fromHex(String hex) throws NoSuchAlgorithmException
+    private byte[] fromHex(String hex)
     {
         byte[] bytes = new byte[hex.length() / 2];
         for(int i = 0; i<bytes.length ;i++)
@@ -65,8 +65,8 @@ public class EncryptPasswordService {
     }
 
     private byte[] getSalt() throws  NoSuchAlgorithmException{
-        SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
         byte[] salt = new byte[16];
+        SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
         sr.nextBytes(salt);
         return salt;
     }

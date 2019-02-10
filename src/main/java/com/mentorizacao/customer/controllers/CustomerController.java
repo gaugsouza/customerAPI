@@ -25,17 +25,36 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * © Copyright Beta IT 2019<br>
+ *
+ * The <code>CustomerController</code> class is the endpoint regarding movie, other word: /customer (back-end).
+ *
+ * @author gaugusto@betait.com.br
+ * @version 1.0
+ * @since JDK1.8
+ *
+ * @see Customer
+ * @see CustomerCanonical
+ * @see EncryptPasswordService
+ * @see RestController
+ * @see RequestMapping
+ */
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
+    /** Logger from CustomerController*/
     private Logger logger = LogManager.getLogger(CustomerController.class);
 
+    /** CustomerService, it means this class will be able to run all CRUD verbs.*/
     @Autowired
     private CustomerService customerService;
 
+    /** CustomerTransformation, this class supports some convertion functions.*/
     @Autowired
     private CustomerTransformation customerTransformation;
 
+    /** EncryptPasswordService, this class supports password encryption functions.*/
     @Autowired
     private EncryptPasswordService encryptPasswordService;
 
@@ -82,6 +101,7 @@ public class CustomerController {
         customer.setDateCreated(currentTime);
         customer.setLastUpdated(currentTime);
 
+        /**Here the password is encrypted*/
         try {
             customer.setEncryptedPassword(encryptPasswordService.encryptPassword(customer.getEncryptedPassword()));
         } catch (NoSuchAlgorithmException e) {
@@ -109,6 +129,7 @@ public class CustomerController {
             fetchedCustomer.get().setState(customer.getState());
             fetchedCustomer.get().setZipCode(customer.getZipCode());
 
+            /**Here the password is encrypted*/
             try {
                 fetchedCustomer.get().setEncryptedPassword(encryptPasswordService.encryptPassword(customer.getEncryptedPassword()));
             } catch (NoSuchAlgorithmException e) {
