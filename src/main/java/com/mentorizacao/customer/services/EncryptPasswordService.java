@@ -9,9 +9,22 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
+/**
+ * @author https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
+ */
 @Service
 public class EncryptPasswordService {
 
+    /**
+     * The encryptPassword method is responsible to make the password secure using PBKDF2WithHmacSHA1.
+     *
+     * @param password - the password that will be encrypted
+     *
+     * @return String  - the password already encrypted
+     *
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
     public String encryptPassword(String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
         int iterations = 1000;
         char[] chars = password.toCharArray();
@@ -23,6 +36,18 @@ public class EncryptPasswordService {
         return iterations + ":" + toHex(salt) + ":" + toHex(hash);
     }
 
+    /**
+     * The validatePassword method is responsible to check if the password provided is valid in
+     * comparison to stored password.
+     *
+     * @param originalPassword - the password informed
+     * @param storedPassword   - the password stored in database
+     *
+     * @return boolean         - the response of password validation (true = valid, false = invalid)
+     *
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
     public boolean validatePassword(String originalPassword, String storedPassword) throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         String[] parts = storedPassword.split(":");
@@ -42,6 +67,12 @@ public class EncryptPasswordService {
         return diff == 0;
     }
 
+    /**
+     * The fromHex method is responsible to convert String to byte[]
+     *
+     * @param hex     - the String that will be converted
+     * @return byte[] - the String converted to byte[]
+     */
     private byte[] fromHex(String hex)
     {
         byte[] bytes = new byte[hex.length() / 2];
@@ -52,19 +83,31 @@ public class EncryptPasswordService {
         return bytes;
     }
 
+    /**
+     * The toHex method is responsible to convert byte[] to String
+     *
+     * @param array   - the byte[] that will be converted
+     * @return String - the byte[] converted to String
+     */
     private String toHex(byte[] array){
         BigInteger bi = new BigInteger(1, array);
         String hex = bi.toString(16);
         int paddingLength = (array.length * 2) - hex.length();
         if(paddingLength > 0)
         {
-            return String.format("%0"  +paddingLength + "d", 0) + hex;
+            return String.format("%0" + paddingLength + "d", 0) + hex;
         }else{
             return hex;
         }
     }
 
-    private byte[] getSalt() throws  NoSuchAlgorithmException{
+    /**
+     * The getSalt method is responsible to generate the salt used in password encryption
+     *
+     * @return byte[] - the generated salt
+     * @throws NoSuchAlgorithmException
+     */
+    private byte[] getSalt() throws NoSuchAlgorithmException{
         byte[] salt = new byte[16];
         SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
         sr.nextBytes(salt);
