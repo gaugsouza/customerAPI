@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
+import javax.validation.constraints.*;
 
 import java.io.Serializable;
 
@@ -39,6 +41,8 @@ public class Customer implements Serializable {
 
     /** The customer's user name and its primary key*/
     @Id
+    @NotNull(message = "The username can't be null.")
+    @Length(min = 3, max = 12, message = "The username must have between 3 and 12 characters.")
     private String userName = null;
 
     /** The auto-generated version of the customer*/
@@ -49,9 +53,11 @@ public class Customer implements Serializable {
     private boolean active = false;
 
     /** The customer's first name */
+    @NotNull(message = "The first name can't be null.")
     private String firstName = null;
 
     /** The customer's last name */
+    @NotNull(message = "The last name can't be null.")
     private String lastName = null;
 
     /** The customer's address */
@@ -64,9 +70,13 @@ public class Customer implements Serializable {
     private String state = null;
 
     /** The customer's zip code*/
+    @NotNull(message = "The zip code can't be null.")
+    @Length(min = 8, max = 8, message = "The CEP must have 8 digits.")
     private String zipCode = null;
 
     /** The customer's password encrypted */
+    @NotNull(message = "The password can't be null.")
+    @Length(min = 6, message = "The password must have at least 6 characters.")
     private String encryptedPassword= null;
 
     /** The creation date of the customer */

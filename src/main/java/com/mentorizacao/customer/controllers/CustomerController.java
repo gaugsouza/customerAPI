@@ -1,6 +1,7 @@
 package com.mentorizacao.customer.controllers;
 
 import com.mentorizacao.customer.services.EncryptPasswordService;
+import com.mentorizacao.customer.utils.CustomerBeanUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,6 +13,9 @@ import com.mentorizacao.customer.domains.Customer;
 import com.mentorizacao.customer.services.CustomerService;
 
 import com.mentorizacao.customer.transformations.CustomerTransformation;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,16 +51,16 @@ public class CustomerController {
     private Logger logger = LogManager.getLogger(CustomerController.class);
 
     /** CustomerService, it means this class will be able to run all CRUD verbs.*/
-    @Autowired
-    private CustomerService customerService;
+    @Autowired private CustomerService customerService;
 
     /** CustomerTransformation, this class supports some convertion functions.*/
-    @Autowired
-    private CustomerTransformation customerTransformation;
+    @Autowired private CustomerTransformation customerTransformation;
 
     /** EncryptPasswordService, this class supports password encryption functions.*/
-    @Autowired
-    private EncryptPasswordService encryptPasswordService;
+    @Autowired private EncryptPasswordService encryptPasswordService;
+
+    /** CustomerBeanUtil, this class supports utilities regarding customer beans.*/
+    @Autowired private CustomerBeanUtil customerBeanUtil;
 
     @GetMapping
     @ApiOperation(value = "Return a list of available customers")
@@ -70,7 +74,18 @@ public class CustomerController {
                     .filter(customer -> customer.isActive())
                     .collect(Collectors.toList()));
         logger.info("Fetched {} customers.", customers.size());
+
         return new CustomerCanonicalAsList(customers);
+    }
+
+    @GetMapping("/paginated")
+    @ApiOperation(value = "Views a list of available movies with pagination")
+    public Page<Customer> get(Pageable pageable) {
+        logger.info("Fetching movies from database...");
+        Page<Customer> customers = this.customerService.findAll(pageable);
+        logger.info("Fetched {} movies.", customers.getTotalElements());
+
+        return customers;
     }
 
     @GetMapping("/{customerId}")
@@ -87,6 +102,7 @@ public class CustomerController {
             }
         }
         logger.info("There isn't any customer from database with id {}.", customerId);
+
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
@@ -94,52 +110,76 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add a new customer to the database layout")
     public CustomerCanonical post(@RequestBody Customer customer){
-        logger.info("Adding a new customer {} into database...", customer);
-        Date currentTime = new Date();
+        logger.info("Validating data...");
+        List<String> violationsMessages = customerBeanUtil.validate(customer);
 
-        customer.setActive(true);
-        customer.setDateCreated(currentTime);
-        customer.setLastUpdated(currentTime);
+        /*Data validation*/
+        if(violationsMessages.size() > 0){
+            logger.error("The following violations were found:");
+            for(String violation : violationsMessages) logger.error(violation);
 
-        /**Here the password is encrypted*/
-        try {
-            customer.setEncryptedPassword(encryptPasswordService.encryptPassword(customer.getEncryptedPassword()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
+            return customerTransformation.convert(customer);
 
-        return customerTransformation.convert(customerService.save(customer));
-    }
+        }else{
+            logger.info("Adding a new customer {} into database...", customer);
+            Date currentTime = new Date();
 
-    @PutMapping("/{customerId}")
-    @ApiOperation(value = "Updates an existing customer by ID")
-    public CustomerCanonical put(@RequestBody Customer customer, @PathVariable String customerId){
-        logger.info("Updating a customer {} into database...", customer);
-        Optional<Customer> fetchedCustomer = this.customerService.findById(customerId);
+            customer.setActive(true);
+            customer.setDateCreated(currentTime);
+            customer.setLastUpdated(currentTime);
 
-        if(fetchedCustomer.isPresent()){
-            fetchedCustomer.get().setLastUpdated(new Date());
-
-            fetchedCustomer.get().setFirstName(customer.getFirstName());
-            fetchedCustomer.get().setLastName(customer.getLastName());
-            fetchedCustomer.get().setAddress(customer.getAddress());
-            fetchedCustomer.get().setCity(customer.getCity());
-            fetchedCustomer.get().setState(customer.getState());
-            fetchedCustomer.get().setZipCode(customer.getZipCode());
-
-            /**Here the password is encrypted*/
+            /*Here the password is encrypted*/
             try {
-                fetchedCustomer.get().setEncryptedPassword(encryptPasswordService.encryptPassword(customer.getEncryptedPassword()));
+                customer.setEncryptedPassword(encryptPasswordService.encryptPassword(customer.getEncryptedPassword()));
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             } catch (InvalidKeySpecException e) {
                 e.printStackTrace();
             }
-        }
 
-        return customerTransformation.convert(customerService.save(fetchedCustomer.get()));
+            return customerTransformation.convert(customerService.save(customer));
+        }
+    }
+
+    @PutMapping("/{customerId}")
+    @ApiOperation(value = "Updates an existing customer by ID")
+    public CustomerCanonical put(@RequestBody Customer customer, @PathVariable String customerId){
+        logger.info("Validating data...");
+        List<String> violationsMessages = customerBeanUtil.validate(customer);
+
+        /*Data validation*/
+        if(violationsMessages.size() > 0){
+            logger.error("The following violations were found:\n.");
+            for(String violation : violationsMessages) logger.error(violation);
+
+            return customerTransformation.convert(customer);
+
+        }else {
+            logger.info("Updating a customer {} into database...", customer);
+            Optional<Customer> fetchedCustomer = this.customerService.findById(customerId);
+
+            if (fetchedCustomer.isPresent()) {
+                fetchedCustomer.get().setLastUpdated(new Date());
+
+                fetchedCustomer.get().setFirstName(customer.getFirstName());
+                fetchedCustomer.get().setLastName(customer.getLastName());
+                fetchedCustomer.get().setAddress(customer.getAddress());
+                fetchedCustomer.get().setCity(customer.getCity());
+                fetchedCustomer.get().setState(customer.getState());
+                fetchedCustomer.get().setZipCode(customer.getZipCode());
+
+                /*Here the password is encrypted*/
+                try {
+                    fetchedCustomer.get().setEncryptedPassword(encryptPasswordService.encryptPassword(customer.getEncryptedPassword()));
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                } catch (InvalidKeySpecException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return customerTransformation.convert(customerService.save(fetchedCustomer.get()));
+        }
     }
 
     @DeleteMapping("/{customerId}")

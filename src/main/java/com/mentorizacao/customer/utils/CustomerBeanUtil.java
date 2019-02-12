@@ -2,7 +2,17 @@ package com.mentorizacao.customer.utils;
 
 import com.mentorizacao.customer.canonicals.CustomerCanonical;
 import com.mentorizacao.customer.domains.Customer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * © Copyright Beta IT 2019<br>
@@ -19,6 +29,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CustomerBeanUtil {
+    /** Logger from CustomerBeanUtil*/
+    private Logger logger = LogManager.getLogger(CustomerBeanUtil.class);
+
     /**
      * The toCustomer(CustomerCanonical) method will transform CustomerCanonical to Customer.
      *
@@ -65,5 +78,27 @@ public class CustomerBeanUtil {
                 .dateCreated(customer.getDateCreated())
                 .lastUpdated(customer.getLastUpdated())
                 .build();
+    }
+
+    /**
+     * The validate method check if there's beans violations in Customer.
+     *
+     * @param customer      - the customer that will be validated.
+     * @return List<String> - the customer's violations, if there's.
+     */
+    public List<String> validate(Customer customer){
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        /*Validating data...*/
+        Set<ConstraintViolation<Customer>> violations = validator.validate(customer);
+        List<String> violationsMessages = new ArrayList<String>();
+
+        /*Adding violations to StringList*/
+        for (ConstraintViolation<Customer> violation : violations){
+            violationsMessages.add(violation.getMessage());
+        }
+
+        return violationsMessages;
     }
 }

@@ -1,9 +1,13 @@
 package com.mentorizacao.customer.services;
 
 import com.mentorizacao.customer.domains.Customer;
+import com.mentorizacao.customer.repositories.CustomerPagingAndSortingRepository;
 import com.mentorizacao.customer.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,8 +32,9 @@ public class CustomerService {
      * CustomerRepository, it means this class will be able to run all verbs like CRUD. What's the meaning of CRUD? Create,
      * Retrieve, Update and Delete regarding movie.
      */
-    @Autowired
-    private CustomerRepository customerRepository;
+    @Autowired private CustomerRepository customerRepository;
+
+    @Autowired private CustomerPagingAndSortingRepository customerPagingAndSortingRepository;
 
     /**
      * The findAll() method will find all customers from database layer.
@@ -90,5 +95,9 @@ public class CustomerService {
         }
 
         return customer;
+    }
+
+    public Page<Customer> findAll(Pageable pageable){
+        return this.customerPagingAndSortingRepository.findAll(pageable);
     }
 }
