@@ -109,7 +109,9 @@ public class CustomerController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add a new customer to the database layout")
-    public CustomerCanonical post(@RequestBody Customer customer){
+    public CustomerCanonical post(@RequestBody CustomerCanonical customerCanonical){
+        Customer customer = customerTransformation.convert(customerCanonical);
+
         logger.info("Validating data...");
         List<String> violationsMessages = customerBeanUtil.validate(customer);
 
@@ -132,9 +134,9 @@ public class CustomerController {
             try {
                 customer.setEncryptedPassword(encryptPasswordService.encryptPassword(customer.getEncryptedPassword()));
             } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                logger.info("No Such Algorithm Exception:" + e);
             } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
+                logger.info("Invalid Key Exception: " + e);
             }
 
             return customerTransformation.convert(customerService.save(customer));
@@ -143,16 +145,15 @@ public class CustomerController {
 
     @PutMapping("/{customerId}")
     @ApiOperation(value = "Updates an existing customer by ID")
-    public CustomerCanonical put(@RequestBody Customer customer, @PathVariable String customerId){
+    public CustomerCanonical put(@RequestBody CustomerCanonical customerCanonical, @PathVariable String customerId){
+        Customer customer = customerTransformation.convert(customerCanonical);
         logger.info("Validating data...");
         List<String> violationsMessages = customerBeanUtil.validate(customer);
 
         /*Data validation*/
-        if(violationsMessages.size() > 0){
+        if(violationsMessages.isEmpty()){
             logger.error("The following violations were found:\n.");
             for(String violation : violationsMessages) logger.error(violation);
-
-            return customerTransformation.convert(customer);
 
         }else {
             logger.info("Updating a customer {} into database...", customer);
@@ -172,14 +173,15 @@ public class CustomerController {
                 try {
                     fetchedCustomer.get().setEncryptedPassword(encryptPasswordService.encryptPassword(customer.getEncryptedPassword()));
                 } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
+                    logger.info("No Such Algorithm Exception:" + e);
                 } catch (InvalidKeySpecException e) {
-                    e.printStackTrace();
+                    logger.info("Invalid Key Exception: " + e);
                 }
-            }
 
-            return customerTransformation.convert(customerService.save(fetchedCustomer.get()));
+                return customerTransformation.convert(customerService.save(fetchedCustomer.get()));
+            }
         }
+        return customerTransformation.convert(customer);
     }
 
     @DeleteMapping("/{customerId}")

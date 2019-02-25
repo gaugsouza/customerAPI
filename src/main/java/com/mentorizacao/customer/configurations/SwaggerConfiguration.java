@@ -53,7 +53,7 @@ public class SwaggerConfiguration {
      * @return ApiInfo
      */
     private ApiInfo metaData() {
-        ApiInfo apiInfo = new ApiInfo(
+        return  new ApiInfo(
                 "Customer REST API",
                 "Customer REST API for Beta IT",
                 "1.0.0",
@@ -63,7 +63,6 @@ public class SwaggerConfiguration {
                         , "gaugusto@betait.com.br"),
                 "Apache License Version 2.0",
                 "https://www.apache.org/licenses/LICENSE-2.0");
-        return apiInfo;
     }
 
 }

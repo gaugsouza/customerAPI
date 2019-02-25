@@ -22,6 +22,5 @@ import java.util.Optional;
  * @see Customer
  */
 @Repository
-public interface CustomerRepository extends CrudRepository<Customer, String>,
-        PagingAndSortingRepository<Customer, String> {
+public interface CustomerRepository extends PagingAndSortingRepository<Customer, String> {
 }

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import javax.validation.constraints.*;
@@ -19,7 +18,7 @@ import java.util.Date;
 /**
  * © Copyright Beta IT 2019<br>
  *
- * The <code>Customer</code> class is POJO (Plain Old Java Object) for a set/get of movie (table) from H2 database.
+ * The <code>Customer</code> class is POJO (Plain Old Java Object) for a set/get of customer (table) from H2 database.
  *
  * @author gaugusto@betait.com.br
  * @version 1.0
