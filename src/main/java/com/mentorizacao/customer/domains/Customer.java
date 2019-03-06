@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import javax.validation.constraints.*;
@@ -14,6 +15,8 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 
 import java.util.Date;
+
+import static javax.persistence.GenerationType.IDENTITY;
 
 /**
  * © Copyright Beta IT 2019<br>
@@ -40,6 +43,9 @@ public class Customer implements Serializable {
 
     /** The customer's user name and its primary key*/
     @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Integer id = null;
+
     @NotNull(message = "The username can't be null.")
     @Length(min = 3, max = 12, message = "The username must have between 3 and 12 characters.")
     private String userName = null;

@@ -39,7 +39,7 @@ public class CustomerService {
      * @return List<Customer> - all customers.
      */
     public List<Customer> findAll(){
-        List<Customer> customers = new ArrayList<Customer>();
+        List<Customer> customers = new ArrayList<>();
         this.customerRepository.findAll().forEach(customers :: add);
         return customers;
     }

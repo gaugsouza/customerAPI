@@ -2,8 +2,6 @@ package com.mentorizacao.customer.utils;
 
 import com.mentorizacao.customer.canonicals.CustomerCanonical;
 import com.mentorizacao.customer.domains.Customer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolation;
@@ -29,9 +27,6 @@ import java.util.Set;
  */
 @Service
 public class CustomerBeanUtil {
-    /** Logger from CustomerBeanUtil*/
-    private Logger logger = LogManager.getLogger(CustomerBeanUtil.class);
-
     /**
      * The toCustomer(CustomerCanonical) method will transform CustomerCanonical to Customer.
      *
@@ -92,7 +87,7 @@ public class CustomerBeanUtil {
 
         /*Validating data...*/
         Set<ConstraintViolation<Customer>> violations = validator.validate(customer);
-        List<String> violationsMessages = new ArrayList<String>();
+        List<String> violationsMessages = new ArrayList<>();
 
         /*Adding violations to StringList*/
         for (ConstraintViolation<Customer> violation : violations){

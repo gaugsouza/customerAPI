@@ -71,7 +71,7 @@ public class CustomerController {
                     .convert(this.customerService
                     .findAll()
                     .stream()
-                    .filter(customer -> customer.isActive())
+                    .filter(Customer::isActive)
                     .collect(Collectors.toList()));
         logger.info("Fetched {} customers.", customers.size());
 
@@ -94,12 +94,10 @@ public class CustomerController {
         logger.info("Fetching customer {} from database...", customerId);
         Optional<Customer> fetchedCustomer = this.customerService.findById(customerId);
 
-        if(fetchedCustomer.isPresent()){
-            if(fetchedCustomer.get().isActive()){
-                CustomerCanonical customerCanonical = customerTransformation.convert(fetchedCustomer.get());
-                logger.info("Fetched {}.", customerCanonical);
-                return new ResponseEntity(customerCanonical, HttpStatus.OK);
-            }
+        if(fetchedCustomer.isPresent() && fetchedCustomer.get().isActive()){
+            CustomerCanonical customerCanonical = customerTransformation.convert(fetchedCustomer.get());
+            logger.info("Fetched {}.", customerCanonical);
+            return new ResponseEntity(customerCanonical, HttpStatus.OK);
         }
         logger.info("There isn't any customer from database with id {}.", customerId);
 
@@ -116,7 +114,7 @@ public class CustomerController {
         List<String> violationsMessages = customerBeanUtil.validate(customer);
 
         /*Data validation*/
-        if(violationsMessages.size() > 0){
+        if(violationsMessages.isEmpty()){
             logger.error("The following violations were found:");
             for(String violation : violationsMessages) logger.error(violation);
 
